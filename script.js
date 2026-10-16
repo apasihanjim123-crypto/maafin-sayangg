@@ -1,23 +1,75 @@
-const yesBtn=document.getElementById("yesBtn");
-const noBtn=document.getElementById("noBtn");
-const buttonArea=document.getElementById("buttonArea");
-const hint=document.getElementById("hint");
-const modal=document.getElementById("modal");
-const closeModal=document.getElementById("closeModal");
-const messages=["Yah, jangan pilih itu dong 😭","Tombolnya malu-malu, hehe 🙈","Coba pencet yang pink aja 💗","Aku serius minta maaf, ya 🥺","Lho kok dikejar terus wkwk 😭"];
-let messageIndex=0;
-function moveNoButton(){
-  const area=buttonArea.getBoundingClientRect(), btn=noBtn.getBoundingClientRect();
-  const maxX=Math.max(0,(area.width-btn.width)/2);
-  const x=(Math.random()*2-1)*maxX;
-  const y=(Math.random()*90)-45;
-  noBtn.style.position="relative";noBtn.style.left=`${x}px`;noBtn.style.top=`${y}px`;
-  hint.textContent=messages[messageIndex++%messages.length];
+const yesBtn = document.getElementById("yesBtn");
+const noBtn = document.getElementById("noBtn");
+const area = document.getElementById("buttonArea");
+const hint = document.getElementById("hint");
+
+// GANTI dengan nomor WhatsApp tujuan.
+// Format Indonesia: 628xxxxxxxxxx, tanpa tanda +.
+const nomorWhatsApp = "6287790895248";
+
+const pesan = [
+  "Yahh, jangan pilih itu dong 😭",
+  "Tombolnya ikut ngambek 🙈",
+  "Pencet Maafin aja, sayang 💗",
+  "Aku beneran minta maaf 🥺",
+  "Hehe, kok dikejar terus 😭"
+];
+
+let urutan = 0;
+
+function pindahTombol() {
+  const areaRect = area.getBoundingClientRect();
+  const tombolRect = noBtn.getBoundingClientRect();
+
+  const maxX = Math.max(
+    0,
+    (areaRect.width - tombolRect.width) / 2 - 5
+  );
+
+  const maxY = Math.max(
+    0,
+    (areaRect.height - tombolRect.height) / 2 - 5
+  );
+
+  const x = (Math.random() * 2 - 1) * maxX;
+  const y = (Math.random() * 2 - 1) * maxY;
+
+  noBtn.style.position = "absolute";
+  noBtn.style.left = `calc(50% + ${x}px)`;
+  noBtn.style.top = `calc(50% + ${y}px)`;
+  noBtn.style.transform = "translate(-50%, -50%)";
+
+  hint.textContent = pesan[urutan % pesan.length];
+  urutan++;
 }
-noBtn.addEventListener("pointerenter",e=>{if(e.pointerType==="mouse")moveNoButton()});
-noBtn.addEventListener("pointerdown",e=>{e.preventDefault();moveNoButton()});
-noBtn.addEventListener("click",e=>{e.preventDefault();moveNoButton()});
-yesBtn.addEventListener("click",()=>{modal.hidden=false;createConfetti()});
-closeModal.addEventListener("click",()=>modal.hidden=true);
-modal.addEventListener("click",e=>{if(e.target===modal)modal.hidden=true});
-function createConfetti(){for(let i=0;i<75;i++){const p=document.createElement("span");p.className="confetti";p.style.left=`${Math.random()*100}vw`;p.style.background=["#ff5f9e","#ffd166","#a78bfa","#7dd3fc","#fb7185"][Math.floor(Math.random()*5)];p.style.animationDelay=`${Math.random()*.8}s`;p.style.animationDuration=`${2+Math.random()*1.8}s`;document.body.appendChild(p);setTimeout(()=>p.remove(),4500)}}
+
+// Kabur saat kursor mendekat di laptop.
+noBtn.addEventListener("pointerenter", (event) => {
+  if (event.pointerType === "mouse") {
+    pindahTombol();
+  }
+});
+
+// Kabur saat disentuh di HP.
+noBtn.addEventListener("pointerdown", (event) => {
+  event.preventDefault();
+  pindahTombol();
+});
+
+// Saat tombol Maafin dipilih, buka WhatsApp.
+yesBtn.addEventListener("click", () => {
+  const nomor = nomorWhatsApp.replace(/\D/g, "");
+
+  if (nomor === "6287790895248") {
+    alert("Ganti nomor WhatsApp di script.js dulu ya!");
+    return;
+  }
+
+  const pesanWA =
+    "Aku mau maafin kamu 💗\n\nMakasih udah minta maaf. Kita ngobrol baik-baik ya.";
+
+  const link =
+    `https://wa.me/${nomor}?text=${encodeURIComponent(pesanWA)}`;
+
+  window.open(link, "_blank");
+});
